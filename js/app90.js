@@ -21,7 +21,8 @@ function addNewTodo () {
     todosArray.push(newTodoObj)
     setLocalStorage(todosArray)
     todosGenerator(todosArray)
-    // console.log(todosArray);
+    
+    inputElem.focus()
 }
 
 
@@ -31,6 +32,8 @@ function setLocalStorage(todosList) {
 function todosGenerator (todosList) {
 
     let newTodoLiElem, newTodoLabalElem, newTodoCompleteBtn, newTodoDeleteBtn
+
+    todoListElem.innerHTML = ''
 
     todosList.forEach(function (todo) {
         console.log(todo);
@@ -47,10 +50,57 @@ function todosGenerator (todosList) {
         newTodoDeleteBtn = $.createElement('button')
         newTodoDeleteBtn.className = 'btn btn-danger'
         newTodoDeleteBtn.innerHTML = 'Delete'
+        newTodoDeleteBtn.setAttribute('onclick' , 'removeTodo(' + todo.id + ')')
 
         newTodoLiElem.append(newTodoLabalElem, newTodoCompleteBtn, newTodoDeleteBtn)
 
         todoListElem.append(newTodoLiElem)
     })
 }
+
+function removeTodo(todoId){
+    // console.log(todoId);
+
+    let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
+
+    todosArray = localStorageTodos
+
+    let mainTodoIndex = todosArray.findIndex(function(todo){
+        return todo.id === todoId
+    })
+
+    todosArray.splice(mainTodoIndex , 1)
+   
+    setLocalStorage(todosArray)
+    todosGenerator(todosArray)
+}
+
+function getLocalStorage() {
+    let localStorageTodo = JSON.parse(localStorage.getItem('todos'))
+
+    if(localStorageTodo) {
+        todosArray = localStorageTodo
+    } else {
+        todosArray = []
+    }
+
+        todosGenerator(todosArray)
+    
+}
+
+function clearTodos() {
+    todosArray = []
+    todosGenerator(todosArray)
+    // localStorage.clear()
+    localStorage.removeItem('todos')
+}
+
+
+window.addEventListener('load' , getLocalStorage)
 addButton.addEventListener('click' , addNewTodo)
+clearButton.addEventListener('click' , clearTodos)
+inputElem.addEventListener('keydown' , function(event) {
+    if(event.code === 'Enter'){
+        addNewTodo()
+    }
+})
