@@ -6,86 +6,106 @@ const todoListElem = $.getElementById('todoList')
 
 let todosArray = []
 
-
-function addNewTodo () {
+function addNewTodo (){
     let newTodoTitle = inputElem.value
-    
-    let newTodoObj = {
-        id : todosArray.length + 1,
-        title : newTodoTitle,
-        complete : false
-    } 
+
+    todosObj = {
+        id: todosArray.length + 1,
+        title: newTodoTitle,
+        complete: false
+    }
 
     inputElem.value = ''
 
-    todosArray.push(newTodoObj)
+    todosArray.push(todosObj)
     setLocalStorage(todosArray)
     todosGenerator(todosArray)
-    
+
     inputElem.focus()
 }
 
 
-function setLocalStorage(todosList) {
+function setLocalStorage(todosList){
     localStorage.setItem('todos' , JSON.stringify(todosList))
 }
-function todosGenerator (todosList) {
 
-    let newTodoLiElem, newTodoLabalElem, newTodoCompleteBtn, newTodoDeleteBtn
-
+function todosGenerator(todoslist){
+    let newTodoLiElem , newTodoLableElem , newTodoCompleteBtn , newTodoDeleteBtn
+   
     todoListElem.innerHTML = ''
 
-    todosList.forEach(function (todo) {
-        console.log(todo);
+    todoslist.forEach(function(todo){
+        // console.log(todo);
         newTodoLiElem = $.createElement('li')
         newTodoLiElem.className = 'completed well'
+        // console.log(newTodoLiElem);
 
-        newTodoLabalElem = $.createElement('label')
-        newTodoLabalElem.innerHTML = todo.title
+        newTodoLableElem = $.createElement('lable')
+        newTodoLableElem.innerHTML = todo.title
+        // console.log(newTodoLableElem);
 
         newTodoCompleteBtn = $.createElement('button')
-        newTodoCompleteBtn.className =  'btn btn-success'
+        newTodoCompleteBtn.className = 'btn btn-success'
         newTodoCompleteBtn.innerHTML = 'Complete'
-        
+        newTodoCompleteBtn.setAttribute('onclick' , 'editTodo(' + todo.id + ')')
+
         newTodoDeleteBtn = $.createElement('button')
         newTodoDeleteBtn.className = 'btn btn-danger'
         newTodoDeleteBtn.innerHTML = 'Delete'
-        newTodoDeleteBtn.setAttribute('onclick' , 'removeTodo(' + todo.id + ')')
+        newTodoDeleteBtn.setAttribute('onclick', 'removeTodo(' + todo.id + ')')
 
-        newTodoLiElem.append(newTodoLabalElem, newTodoCompleteBtn, newTodoDeleteBtn)
+        if(todo.complete){
+            newTodoLiElem.className = 'uncompleted well'
+            newTodoCompleteBtn.innerHTML = 'UnComplete'
+        }
+
+        newTodoLiElem.append(newTodoLableElem , newTodoCompleteBtn , newTodoDeleteBtn)
 
         todoListElem.append(newTodoLiElem)
     })
 }
 
-function removeTodo(todoId){
-    // console.log(todoId);
+function editTodo(todoId){
 
     let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
-
     todosArray = localStorageTodos
 
-    let mainTodoIndex = todosArray.findIndex(function(todo){
-        return todo.id === todoId
+    todosArray.forEach(function(todo){
+        if(todo.id === todoId) {
+            todo.complete = !todo.complete
+        }
     })
-
-    todosArray.splice(mainTodoIndex , 1)
-   
     setLocalStorage(todosArray)
     todosGenerator(todosArray)
 }
 
+function removeTodo(todoId) {
+ 
+    let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
+    todosArray = localStorageTodos
+
+    let mainTodoIndex = todosArray.findIndex(function (todo) {
+        return todo.id === todoId
+    })
+
+    todosArray.splice(mainTodoIndex , 1)
+
+    setLocalStorage(todosArray)
+    todosGenerator(todosArray)
+}
+
+
 function getLocalStorage() {
-    let localStorageTodo = JSON.parse(localStorage.getItem('todos'))
-
-    if(localStorageTodo) {
-        todosArray = localStorageTodo
-    } else {
-        todosArray = []
-    }
-
-        todosGenerator(todosArray)
+   let localStorageTodos = JSON.parse(localStorage.getItem('todos'))
     
+   if(localStorageTodos){
+        todosArray = localStorageTodos
+   }
+   else{
+    todosArray = []
+   }
+
+   todosGenerator(todosArray)
 }
 
 function clearTodos() {
@@ -95,12 +115,11 @@ function clearTodos() {
     localStorage.removeItem('todos')
 }
 
-
 window.addEventListener('load' , getLocalStorage)
 addButton.addEventListener('click' , addNewTodo)
 clearButton.addEventListener('click' , clearTodos)
-inputElem.addEventListener('keydown' , function(event) {
-    if(event.code === 'Enter'){
+inputElem.addEventListener('keydown' , function(event){
+    if (event.code === 'Enter') {
         addNewTodo()
     }
 })
