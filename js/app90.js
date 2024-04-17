@@ -9,7 +9,7 @@ let todosArray = []
 function addNewTodo (){
     let newTodoTitle = inputElem.value
 
-    todosObj = {
+    let newTodosObj = {
         id: todosArray.length + 1,
         title: newTodoTitle,
         complete: false
@@ -17,7 +17,7 @@ function addNewTodo (){
 
     inputElem.value = ''
 
-    todosArray.push(todosObj)
+    todosArray.push(newTodosObj)
     setLocalStorage(todosArray)
     todosGenerator(todosArray)
 
